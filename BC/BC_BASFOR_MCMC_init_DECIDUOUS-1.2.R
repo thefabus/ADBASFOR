@@ -2,7 +2,7 @@
    nChain                   <- as.integer(100)
 
 ## PRIOR ##
-   file_prior               <- 'parameters/parameters_BC_DECIDUOUS-1&2.txt'
+   file_prior               <- 'parameters/parameters_BC_DECIDUOUS-1.2.txt'
    
 ## INITIALISATION FILES FOR THE DIFFERENT CALIBRATION SITES ##
    sitesettings_files        <- c('initialisation/initialise_BASFOR_DECIDUOUS-1.R',

@@ -1,5 +1,5 @@
 ## 1. INITIALISE MCMC ##
-   source('BC/BC_BASFOR_MCMC_init_DECIDUOUS-1&2.R')
+   source('BC/BC_BASFOR_MCMC_init_DECIDUOUS-1.2.R')
 
 ## 2. RUNNING THE MCMC ##
    source('BC/BC_BASFOR_MCMC.R')
