@@ -108,11 +108,11 @@ Contains
     NLMIN     = NLAMAX * (1.0-exp(-KEXT*LAI)) / KEXT               ! kg N m-2 AC
     if (LAI == 0.) then
       NEFF    = 0.
-	  NSTATUS = 0.
-	else
+      NSTATUS = 0.
+    else
       NEFF    = max( 0., min( 1., (NL/AC-NLAMIN*LAI) / (NLMAX-NLAMIN*LAI) ) ) ! -
       NSTATUS = max( 0., (NL/AC-NLMIN)/(NLMAX-NLMIN) )             ! -
-	end if
+    end if
     NSTATUSF  = min( NSTATUS, 0.999*FNCLMIN )                      ! -
     LAIcrit   = log( (NSTATUSF-1.0)/(NSTATUSF-FNCLMIN) ) / KEXT    ! m2 leaf m-2 AC  
   ! Leaf C

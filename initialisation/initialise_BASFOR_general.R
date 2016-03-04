@@ -53,28 +53,24 @@ read_weather_BASFOR <- function(y = year_start,
 ### 3. OUTPUT VARIABLES
 ################################################################################
 outputNames <- c(
- "Time"             , "year"           , "doy"             ,
- "AC"               , "dCLold"         , "dCLsenNdef"      , "dLAIold"             ,
- "dNLdeath"         , "dNLlitt"        , "LAI"             , "LAIcrit"             ,
- "LAIsurv"          , "NL"             , "NLsurv"          , "NLsurvMIN"           ,
- "recycNLold"       , "retrNLMAX"      ,
- "CL"               , "Cwood"          , "CLBS"            , "CR"                  ,
- "CRES"             , "WC"             , "CLITT"           , "CSOM"                ,
- "Csoil"            , "Nsoil"          , "DBH"             , "H"                   ,
- "Rsoil"            , "NEE_gCm2d"      , "GPP_gCm2d"       , "Reco_gCm2d"          ,
- "ET_mmd"           , "NemissionN2O"   , "NemissionNO"     )
+ "Time"           , "year"          , "doy"          ,
+ "T"              , "RAIN"          ,
+ "CR"             , "Cwood"         , "CL"           , "CLBS"         , "CRES"      ,
+ "NL"             ,
+ "WC"             , "CLITT"         , "CSOM"         , "Csoil"        , "Nsoil"     ,
+ "DBH"            , "H"             , "LAI"          ,
+ "Rsoil"          , "NEE_gCm2d"     , "GPP_gCm2d"    , "Reco_gCm2d"   ,
+ "ET_mmd"         , "NemissionN2O"  , "NemissionNO" )
   
 outputUnits <- c(
-  "(y)"             , ""               , ""                ,
-  "(m2 AC m-2)"     , "(kg C m-2 d-1)" , "(kg C m-2 d-1)"  , "(m2 leaf m-2 AC d-1)",
-  "(kg N m-2 d-1)"  , "(kg N m-2 d-1)" , "(m2 leaf m-2 AC)", "(m2 leaf m-2 AC)"    ,
-  "(m2 leaf m-2 AC)", "(kg N m-2)"     , "(kg N m-2 AC)"   , "(kg N m-2 AC)"       ,
-  "(kg N m-2 d-1)"  , "(kg N m-2 d-1)" ,
-  "(kg C m-2)"      , "(kg C m-2)"     , "(kg C m-2)"      , "(kg C m-2)"          ,
-  "(kg C m-2)"      , "(m3 m-3)"       , "(kg C m-2)"      , "(kg C m-2)"          ,
-  "(kg C m-2)"      , "(kg N m-2)"     , "(m)"             , "(m)"                 ,
-  "(kg C m-2 d-1)"  , "(g C m-2 d-1)"  , "(g C m-2 d-1)"   , "(g C m-2 d-1)"       ,
-  "(mm d-1)"        , "(kg N m-2 d-1)" , "(kg N m-2 d-1)" )  
+  "y"             , "y"             , "d"            ,
+  "(degC)"        , "(mm d-1)"      ,
+  "(t C ha-1)"    , "(t C ha-1)"    , "(t C ha-1)"   , "(t C ha-1)"   , "(t C ha-1)",
+  "(kg N m-2)"    ,
+  "(m3 m-3)"      , "(kg C m-2)"    , "(kg C m-2)"   , "(t C ha-1)"   , "(t N ha-1)",
+  "(m)"           , "(m)"           , "(m2 m-2)"     ,
+  "(kg C m-2 d-1)", "(g C m-2 d-1)" , "(g C m-2 d-1)", "(g C m-2 d-1)",
+  "(mm d-1)"      , "(kg N m-2 d-1)", "(kg N m-2 d-1)" )  
   
 NOUT <- as.integer( length(outputNames) )
    
