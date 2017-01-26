@@ -1,5 +1,5 @@
 ### EXAMPLES OF SCRIPT-CODE FOR BASFOR
-### MvO, 2016-03-02
+### MvO, 2017-01-24
 ### This file gives some (sparsely commented) examples of code that can
 ### be included in R-scripts for working with forest model BASFOR
 
