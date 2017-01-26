@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Manual for multi-site BC with BASFOR</title>
+<!-- 2017-01-24 Tue 17:33 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Marcel van Oijen" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Manual for multi-site BC with BASFOR</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Introduction</a></li>
+<li><a href="#sec-2">2. Calibration data</a></li>
+<li><a href="#sec-3">3. Multi-site BC step-by-step</a>
+<ul>
+<li><a href="#sec-3-1">3.1. Calibration data</a></li>
+<li><a href="#sec-3-2">3.2. Initialisation files</a></li>
+<li><a href="#sec-3-3">3.3. Weather data</a></li>
+<li><a href="#sec-3-4">3.4. Parameters: default settings</a></li>
+<li><a href="#sec-3-5">3.5. Parameters: calibration settings</a></li>
+<li><a href="#sec-3-6">3.6. MCMC-initialisation file</a></li>
+<li><a href="#sec-3-7">3.7. Script file for the Bayesian calibration</a></li>
+<li><a href="#sec-3-8">3.8. Run the calibration</a></li>
+<li><a href="#sec-3-9">3.9. Inspect results</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This manual shows step-by-step how to carry out a multi-site Bayesian
+calibration using forest model BASFOR. The procedure was tested on the
+files in directory 'BASFOR_2015-04-21'. Calibration data consist of
+eddy-covariance data and ancillary data from unspecified European
+forest sites, both coniferous and deciduous.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Calibration data</h2>
+<div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li>During calibration, the calibration data are compared to values of
+model output variables. The list of the model's output variables
+thus determines which data can be used to calibrate the model's
+parameters. To see which output variables are defined for BASFOR it
+is easiest to simply initialise the model (e.g. by running the
+general initialisation file 'initialise_BASFOR_general.R') and type
+'outputNames' in the console. And type 'outputUnits' to see the
+array with the units.
+<ul class="org-ul">
+<li>Alternatively, the list of output variables can be found in the
+FORTRAN-file 'model/BASFOR.f90', where the variables are
+calculated. [NOTE: the two files 'initialise_BASFOR_general.R' and
+'BASFOR.f90' must stay consistent with each other, so if you
+decide to add or delete output variables, make the appropriate
+changes in both files].
+</li>
+</ul>
+</li>
+<li>The calibration can handle four types of data files: see the
+examples that are given for how they should be formatted:
+<ul class="org-ul">
+<li>Ancillary data (e.g. 'data_ancillary_CONIFEROUS-1.txt'):
+txt-files with five columns: (1) variable name, (2) measurement
+year (3) measurement day, (4) measurement value, (5) measurement
+uncertainty
+</li>
+<li>Annual data (e.g. 'data_ANNUAL_DECIDUOUS-1.txt'): txt-files
+with five columns. The columns are similar to those for the
+ancillary data, but the second and third column now represent the
+last day of the year over which the variable was averaged and the
+fourth column gives the annual mean rather than a measurement for
+that specific day.
+<ul class="org-ul">
+<li>Annual data can be provided for any output variable from the
+model, i.e. ancillary variables as well as EC-variables.
+</li>
+</ul>
+</li>
+<li>Daily data (e.g. 'data_daily_CONIFEROUS-1.txt'), with the same
+five-column structure as the ancillary data.
+</li>
+<li>EC-data (e.g. 'data_EC_CONIFEROUS-1.txt'): txt-files with six
+columns with headers representing year and day of measurement,
+Reco, NEE, GPP, ET.
+</li>
+<li>There are differences between these data-file types in how they
+are handled in the calibration.
+<ul class="org-ul">
+<li>The 'daily' and 'EC' data can be time-averaged over multiple
+days (e.g. 30 to get monthly averages) which is specified in the
+file 'BC_BASFOR_MCMC_init_general.R'. The same time-averaging
+will then automatically be applied to the corresponding model
+output variables.
+</li>
+<li>The annual data are interpreted as already representing annual
+averages (so the calibration code ensures that the corresponding
+model variables are annual-averaged too).
+</li>
+<li>The ancillary data cannot be time-averaged.
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Multi-site BC step-by-step</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Calibration data</h3>
+<div class="outline-text-3" id="text-3-1">
+<ul class="org-ul">
+<li>Put calibration data files in subdirectory 'data'.
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Initialisation files</h3>
+<div class="outline-text-3" id="text-3-2">
+<ul class="org-ul">
+<li>For each site, put a model initialisation file in subdirectory
+'initialisation'.
+</li>
+<li>Check that each initialisation file refers to the correct model
+dll-file ('MODEL_dll &lt;- BASFOR_conif.DLL' or 'MODEL_dll &lt;-
+BASFOR_decid.DLL').
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> Weather data</h3>
+<div class="outline-text-3" id="text-3-3">
+<ul class="org-ul">
+<li>For each site, add a weather file to subdirectory 'weather'.
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> Parameters: default settings</h3>
+<div class="outline-text-3" id="text-3-4">
+<ul class="org-ul">
+<li>Create a txt-file with, for every site, default values of all
+parameters in the model.
+<ul class="org-ul">
+<li>Copy, rename and adapt 'parameters.txt' (or simply use it as it is
+if you are happy with the defaults it provides for two coniferous
+and two deciduous sites).
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> Parameters: calibration settings</h3>
+<div class="outline-text-3" id="text-3-5">
+<ul class="org-ul">
+<li>Create a txt-file that specifies the parameters to be calibrated,
+and their prior distribution.
+<ul class="org-ul">
+<li>For example: copy, rename and adapt 'parameters_BC_CONIFEROUS-1&amp;2.txt'.
+</li>
+<li>The file must have five columns: (1) parameter name, (2) parameter
+minimum, (3) parameter mode, (4) parameter maximum, (5) sites to
+which the row corresponds (you can have more than one row for the
+same parameter if you want it to be differently calibrated for
+different sites, see the final twelve rows in
+'parameters_BC_CONIFEROUS-1&amp;2.txt').
+</li>
+<li>In column 5, specify '1' if you are doing a single-site
+calibration, '1:nSites' if you are doing a multi-site calibration
+where the parameter is generic, and so-on. The value of nSites is
+automatically set equal to the number of sites that you are going
+to run the calibration for. [So if you happen to be doing a
+single-site calibration, then specifying 1 or 1:nSites in column 5
+is equivalent].
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-3-6" class="outline-3">
+<h3 id="sec-3-6"><span class="section-number-3">3.6</span> MCMC-initialisation file</h3>
+<div class="outline-text-3" id="text-3-6">
+<ul class="org-ul">
+<li>Copy, rename and adapt 'BC_BASFOR_MCMC_init_CONIFEROUS-1&amp;2.R' or
+another of the provided Bayesian Calibration initialisation files.
+</li>
+<li>Set the chain length (nChain). Set it to a small number like 20 or a
+100 while testing your code and then for proper calibration set it
+to 10^4 - 10^5:
+<ul class="org-ul">
+<li><b>nChain &lt;- as.integer(&#x2026;)</b>
+</li>
+</ul>
+</li>
+<li>Give the name of the file with your prior for the calibration parameters:
+<ul class="org-ul">
+<li><b>file_prior &lt;- &#x2026;</b>
+</li>
+</ul>
+</li>
+<li>List the names of the model initialisation files:
+<ul class="org-ul">
+<li><b>sitesettings_files &lt;- c(&#x2026;)</b>
+</li>
+</ul>
+</li>
+<li>List the names of files with ancillary data. If a site has no
+ancillary data just assign ''. IMPORTANT: Use the same order as
+for the initialisation files:
+<ul class="org-ul">
+<li><b>sitedata_ancillary_files &lt;- c(&#x2026;)</b>
+</li>
+</ul>
+</li>
+<li>List the names of files with annual data. If a site has no
+annual data just assign ''. IMPORTANT: Use the same order as
+for the initialisation files:
+<ul class="org-ul">
+<li><b>sitedata_annual_files &lt;- c(&#x2026;)</b>
+</li>
+</ul>
+</li>
+<li>List the names of files with daily data. If a site has no
+ancillary data just assign ''. IMPORTANT: Use the same order as
+for the initialisation files:
+<ul class="org-ul">
+<li><b>sitedata_daily_files &lt;- c(&#x2026;)</b>
+</li>
+</ul>
+</li>
+<li>List the names of files with eddy-covariance (EC) data. If a site has no
+EC-data just assign ''. IMPORTANT: Use the same order as
+for the initialisation files:
+<ul class="org-ul">
+<li><b>sitedata_EC_files &lt;- c(&#x2026;)</b>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-3-7" class="outline-3">
+<h3 id="sec-3-7"><span class="section-number-3">3.7</span> Script file for the Bayesian calibration</h3>
+<div class="outline-text-3" id="text-3-7">
+<ul class="org-ul">
+<li>Copy, rename and adapt 'BC_BASFOR_CONIFEROUS-1&amp;2.R' or another of the
+example files.
+<ul class="org-ul">
+<li>The first 'sourced' R-file should be the MCMC-initialisation file
+that we have specified before.
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-3-8" class="outline-3">
+<h3 id="sec-3-8"><span class="section-number-3">3.8</span> Run the calibration</h3>
+<div class="outline-text-3" id="text-3-8">
+<ul class="org-ul">
+<li>Run the script file for the Bayesian calibration.
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-3-9" class="outline-3">
+<h3 id="sec-3-9"><span class="section-number-3">3.9</span> Inspect results</h3>
+<div class="outline-text-3" id="text-3-9">
+<ul class="org-ul">
+<li>Standard the following files are produced:
+<ul class="org-ul">
+<li>'BASFOR_parModes[_TIME].txt'
+<ul class="org-ul">
+<li>Table of ALL parameters (not just the calibrated ones) with
+multiple columns per site: mode of prior, mode of posterior
+(MAP), maximum likelihood estimate (MaxL)
+</li>
+</ul>
+</li>
+<li>'BC_parameters_priorbeta_histograms[_TIME].pdf'
+<ul class="org-ul">
+<li>For each calibrated parameter a histogram of posterior with
+superimposed a curve for the prior. First the generic parameters
+followed by the site-specific parameters, in order of site
+number.
+</li>
+</ul>
+</li>
+<li>'BC_parameters_traceplots[_TIME].pdf'
+<ul class="org-ul">
+<li>For each calibrated parameter a trace plot. Generic parameters
+are shown first, followed by the site-specific parameters, in
+order of site number.
+</li>
+</ul>
+</li>
+<li>'BC_BASFOR_SITE[SITENUMBER][_TIME].pdf'
+<ul class="org-ul">
+<li>One such file per site, with for each calibration variable a
+time plot showing the data and three simulation curves: prior
+mode, MAP, MaxL. Also included, in dashed lines, are uncertainty
+intervals [Q5,Q95].
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Marcel van Oijen</p>
+<p class="date">Created: 2017-01-24 Tue 17:33</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.2.7b)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
