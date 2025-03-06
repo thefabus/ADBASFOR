@@ -1,0 +1,21 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+	"name": "ADBASFOR",
+	"dockerFile": "Dockerfile",
+	"postCreateCommand": "conda init --all; sudo chown -R vscode:vscode /opt",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",           // Python support
+				"ms-toolsai.jupyter",         // Jupyter support
+				"Gimly81.fortran",            // Fortran support
+				"ms-vscode.cpptools"          // C/C++ support, useful for Fortran
+			],
+			"settings": {
+				"python.defaultInterpreterPath": "/opt/miniforge/bin/python"
+			}
+		}
+	}
+	
+}

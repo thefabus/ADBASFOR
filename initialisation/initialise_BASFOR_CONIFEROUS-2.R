@@ -9,7 +9,7 @@
     parcol       <- 2  
     
 ## 2. GENERAL INITIALISATION ##
-  MODEL_dll <- 'BASFOR_conif.DLL'
+  MODEL_dll <- 'BASFOR_conif.so'
   source('initialisation/initialise_BASFOR_general.R')
 
 ## 3. WEATHER
