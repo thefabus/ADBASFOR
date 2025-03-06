@@ -18,6 +18,8 @@ use soil
 use management
 implicit none
 
+integer :: day, doy, NDAYS, NOUT, year
+
 ! As long as the total number of parameters stays below 100, the next line need not be changed
 integer, parameter        :: NPAR     = 100
 real                      :: PARAMS(NPAR)
@@ -27,8 +29,6 @@ real   , dimension(100,3) :: CALENDAR_FERT, CALENDAR_NDEP, CALENDAR_PRUNT, CALEN
 integer, dimension(100,2) :: DAYS_FERT    , DAYS_NDEP    , DAYS_PRUNT    , DAYS_THINT
 real   , dimension(100)   :: NFERTV       , NDEPV        , FRPRUNT	     , FRTHINT
 real                      :: y(NDAYS,NOUT)
-
-integer :: day, doy, NDAYS, NOUT, year
 
 ! State variables
 real    :: chillday, Tsum
@@ -190,5 +190,39 @@ do day = 1, NDAYS
 
 end do ! end time loop
 
-end  
+end subroutine BASFOR
 
+
+subroutine BASFOR_C(params_ptr, matrix_weather_ptr, calendar_fert_ptr, &
+                     calendar_ndep_ptr, calendar_prunt_ptr, calendar_thint_ptr, &
+                     ndays, nout, y_ptr) bind(C, name="BASFOR_C")
+  use, intrinsic:: iso_c_binding, only: c_int, c_double, c_ptr, c_f_pointer
+  use parameters, only: NMAXDAYS
+  implicit none
+
+  type(c_ptr), value :: params_ptr, matrix_weather_ptr, calendar_fert_ptr
+  type(c_ptr), value :: calendar_ndep_ptr, calendar_prunt_ptr, calendar_thint_ptr
+  type(c_ptr), value :: y_ptr
+  integer(c_int), value :: ndays, nout
+
+  real(c_double), pointer :: params(:)
+  real(c_double), pointer :: matrix_weather(:,:)
+  real(c_double), pointer :: calendar_fert(:,:)
+  real(c_double), pointer :: calendar_ndep(:,:)
+  real(c_double), pointer :: calendar_prunt(:,:)
+  real(c_double), pointer :: calendar_thint(:,:)
+  real(c_double), pointer :: y(:,:)
+
+  integer, dimension(:), allocatable :: arr_shape
+
+  call c_f_pointer(params_ptr, params, [100])
+  call c_f_pointer(matrix_weather_ptr, matrix_weather, [NMAXDAYS, 7])
+  call c_f_pointer(calendar_fert_ptr, calendar_fert, [100, 3])
+  call c_f_pointer(calendar_ndep_ptr, calendar_ndep, [100, 3])
+  call c_f_pointer(calendar_prunt_ptr, calendar_prunt, [100, 3])
+  call c_f_pointer(calendar_thint_ptr, calendar_thint, [100, 3])
+  call c_f_pointer(y_ptr, y, [ndays, nout])
+
+  call BASFOR(params, matrix_weather, calendar_fert, calendar_ndep, &
+              calendar_prunt, calendar_thint, ndays, nout, y)
+end subroutine BASFOR_C
