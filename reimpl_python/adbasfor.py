@@ -8,9 +8,8 @@ import numpy as np
 @torch.library.custom_op("adbasfor::adbasfor", mutates_args=[], device_types="cpu")
 def adbasfor_op(params: torch.Tensor, matrix_weather: torch.Tensor, calendar_fert: torch.Tensor, calendar_Ndep: torch.Tensor, calendar_prunT: torch.Tensor, calendar_thinT: torch.Tensor, ndays: torch.Tensor) -> torch.Tensor:
     device = params.device
-    output = submit(
-        call_BASFOR_C, 
-        params.cpu().numpy(), 
+    output = call_BASFOR_C(
+        params.cpu().numpy(),
         matrix_weather.cpu().numpy(),
         calendar_fert.cpu().numpy(),
         calendar_Ndep.cpu().numpy(),
@@ -32,7 +31,7 @@ def backward(ctx, grad_output):
     saved = [x.detach().numpy() for x in saved]
     saved[-1] = int(saved[-1]) # ndays
     
-    grad_input = list(submit(call_dBASFOR_C, *saved, dy=grad_output))
+    grad_input = list(call_dBASFOR_C(*saved, dy=grad_output))
 
     grad_input[0] = grad_input[0][:saved[0].size] # params
     grad_input = [torch.from_numpy(x) for x in grad_input]

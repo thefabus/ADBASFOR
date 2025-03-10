@@ -197,6 +197,7 @@ subroutine BASFOR_C(params_ptr, matrix_weather_ptr, calendar_fert_ptr, &
                      calendar_ndep_ptr, calendar_prunt_ptr, calendar_thint_ptr, &
                      ndays, nout, y_ptr) bind(C, name="BASFOR_C")
   use, intrinsic:: iso_c_binding, only: c_int, c_double, c_ptr, c_f_pointer
+  use reset, only: reset_all
   use parameters, only: NMAXDAYS
   implicit none
 
@@ -222,6 +223,8 @@ subroutine BASFOR_C(params_ptr, matrix_weather_ptr, calendar_fert_ptr, &
   call c_f_pointer(calendar_prunt_ptr, calendar_prunt, [100, 3])
   call c_f_pointer(calendar_thint_ptr, calendar_thint, [100, 3])
   call c_f_pointer(y_ptr, y, [ndays, nout])
+
+  call reset_all()
 
   call BASFOR(params, matrix_weather, calendar_fert, calendar_ndep, &
               calendar_prunt, calendar_thint, ndays, nout, y)
