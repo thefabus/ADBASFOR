@@ -1,24 +1,14 @@
 import ctypes
 import numpy as np
 
-from general import NMAXDAYS
+from general import NMAXDAYS, NOUT
 
 def call_BASFOR_C(params, matrix_weather, calendar_fert, calendar_ndep,
-                  calendar_prunt, calendar_thint, ndays, nout, y):
-    """
-    Call the BASFOR_C Fortran routine via ctypes.
-    
-    Parameters:
-      params         - 1D numpy array, shape (100,), dtype=np.float64
-      matrix_weather - 2D numpy array, shape (ndays, 7), dtype=np.float64
-      calendar_fert  - 2D numpy array, shape (100, 3), dtype=np.float64
-      calendar_ndep  - 2D numpy array, shape (100, 3), dtype=np.float64
-      calendar_prunt - 2D numpy array, shape (100, 3), dtype=np.float64
-      calendar_thint - 2D numpy array, shape (100, 3), dtype=np.float64
-      y              - 2D numpy array, shape (ndays, nout), dtype=np.float64
-                       (This array must be preallocated; its contents will be
-                        overwritten by BASFOR_C.)
-    """
+                  calendar_prunt, calendar_thint, ndays):
+
+    nout = NOUT
+    assert ndays <= NMAXDAYS
+    y = np.zeros((ndays, nout), dtype=np.float64)
 
     params = np.pad(params, (0, max(0, 100 - len(params))), mode='constant', constant_values=0)
     
@@ -85,21 +75,10 @@ def call_BASFOR_C(params, matrix_weather, calendar_fert, calendar_ndep,
     return y
 
 def call_dBASFOR_C(params, matrix_weather, calendar_fert, calendar_ndep,
-                  calendar_prunt, calendar_thint, ndays, nout, dy):
-    """
-    Call the BASFOR_C Fortran routine via ctypes.
-    
-    Parameters:
-      params         - 1D numpy array, shape (100,), dtype=np.float64
-      matrix_weather - 2D numpy array, shape (ndays, 7), dtype=np.float64
-      calendar_fert  - 2D numpy array, shape (100, 3), dtype=np.float64
-      calendar_ndep  - 2D numpy array, shape (100, 3), dtype=np.float64
-      calendar_prunt - 2D numpy array, shape (100, 3), dtype=np.float64
-      calendar_thint - 2D numpy array, shape (100, 3), dtype=np.float64
-      y              - 2D numpy array, shape (ndays, nout), dtype=np.float64
-                       (This array must be preallocated; its contents will be
-                        overwritten by BASFOR_C.)
-    """
+                  calendar_prunt, calendar_thint, ndays, dy):
+
+    nout = NOUT
+    assert ndays < NMAXDAYS
 
     params = np.pad(params, (0, max(0, 100 - len(params))), mode='constant', constant_values=0)
     
@@ -198,7 +177,7 @@ def call_dBASFOR_C(params, matrix_weather, calendar_fert, calendar_ndep,
         dy_ptr
     )
 
-    grads = (dparams, dmatrix_weather, dcalendar_fert, dcalendar_ndep, dcalendar_prunt, dcalendar_thint, dy)
+    grads = (dparams, dmatrix_weather, dcalendar_fert, dcalendar_ndep, dcalendar_prunt, dcalendar_thint)
 
     return grads
 
