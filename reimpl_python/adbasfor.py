@@ -31,7 +31,7 @@ def backward(ctx, grad_output):
     saved = [x.detach().numpy() for x in saved]
     saved[-1] = int(saved[-1]) # ndays
     
-    grad_input = list(call_dBASFOR_C(*saved, dy=grad_output))
+    grad_input = list(call_dBASFOR_C(*saved, y=grad_output.cpu().detach().numpy()))
 
     grad_input[0] = grad_input[0][:saved[0].size] # params
     grad_input = [torch.from_numpy(x) for x in grad_input]

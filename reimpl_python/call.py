@@ -1,185 +1,110 @@
-import ctypes
 import numpy as np
+from types import SimpleNamespace
 
 from general import NMAXDAYS, NOUT
 
+C_SRC = """
+void BASFOR_C(double *params, double *matrix_weather,
+                double *calendar_fert, double *calendar_ndep,
+                double *calendar_prunt, double *calendar_thint,
+                int ndays, int nout, double *y);
+
+void dBASFOR_C(double *params, double *dparams,
+                double *matrix_weather, double *dmatrix_weather,
+                double *calendar_fert, double *dcalendar_fert,
+                double *calendar_ndep, double *dcalendar_ndep,
+                double *calendar_prunt, double *dcalendar_prunt,
+                double *calendar_thint, double *dcalendar_thint,
+                int ndays, int nout, double *y, double *dy);
+"""
+
+#from basfor_cffi import lib, ffi
+
+from cffi import FFI
+ffi = FFI()
+lib = ffi.dlopen("../BASFOR_conif.so")
+ffi.cdef(C_SRC)
+
+def assert_eq(a, b):
+    assert a == b, f"Assertion failed: {a} != {b}"
+
+def assert_shapes(args: SimpleNamespace):
+    args.params = np.pad(args.params, (0, max(0, 100 - len(args.params))), mode='constant', constant_values=0)
+    assert_eq(args.params.shape, (100,))
+    assert_eq(args.matrix_weather.shape, (NMAXDAYS, 7))
+    assert_eq(args.calendar_fert.shape, (100, 3))
+    assert_eq(args.calendar_ndep.shape, (100, 3))
+    assert_eq(args.calendar_prunt.shape, (100, 3))
+    assert_eq(args.calendar_thint.shape, (100, 3))
+    assert_eq(args.y.shape, (args.ndays, NOUT))
+    assert args.ndays <= NMAXDAYS
+
+def as_fortran(args: SimpleNamespace):
+    for k, v in vars(args).items():
+        if isinstance(v, np.ndarray):
+            setattr(args, k, np.asfortranarray(v, dtype=np.float64))
+    return args
+
+def zeros_like(args: SimpleNamespace):
+    dargs = SimpleNamespace()
+    for k, v in vars(args).items():
+        if isinstance(v, np.ndarray):
+            setattr(dargs, k, np.zeros_like(v, dtype=np.float64))
+    return dargs
+
+def cast(nda):
+    return ffi.cast("double *", ffi.from_buffer(nda.T))
+
 def call_BASFOR_C(params, matrix_weather, calendar_fert, calendar_ndep,
                   calendar_prunt, calendar_thint, ndays):
-
-    nout = NOUT
-    assert ndays <= NMAXDAYS
-    y = np.zeros((ndays, nout), dtype=np.float64)
-
-    params = np.pad(params, (0, max(0, 100 - len(params))), mode='constant', constant_values=0)
     
-    # Ensure the arrays are Fortran-ordered (column-major) since Fortran expects that.
-    params = np.asfortranarray(params, dtype=np.float64)
-    matrix_weather = np.asfortranarray(matrix_weather, dtype=np.float64)
-    calendar_fert = np.asfortranarray(calendar_fert, dtype=np.float64)
-    calendar_ndep = np.asfortranarray(calendar_ndep, dtype=np.float64)
-    calendar_prunt = np.asfortranarray(calendar_prunt, dtype=np.float64)
-    calendar_thint = np.asfortranarray(calendar_thint, dtype=np.float64)
-    y = np.asfortranarray(y, dtype=np.float64)
+    args = SimpleNamespace(**locals())
+    args.y = np.zeros((ndays, NOUT), dtype=np.float64)
+
+    assert_shapes(args)
+    args = as_fortran(args)
     
-    # Load the shared library (adjust the library name/path as needed)
-    lib = ctypes.CDLL("../BASFOR_conif.so")
-    
-    # Set the argument types for the BASFOR_C routine.
-    # The Fortran subroutine accepts pointers (as c_void_p) and two integers.
-    lib.BASFOR_C.argtypes = [
-        ctypes.c_void_p,  # params_ptr
-        ctypes.c_void_p,  # matrix_weather_ptr
-        ctypes.c_void_p,  # calendar_fert_ptr
-        ctypes.c_void_p,  # calendar_ndep_ptr
-        ctypes.c_void_p,  # calendar_prunt_ptr
-        ctypes.c_void_p,  # calendar_thint_ptr
-        ctypes.c_int,     # ndays
-        ctypes.c_int,     # nout
-        ctypes.c_void_p   # y_ptr
-    ]
-    
-    assert params.dtype == np.float64
-    assert matrix_weather.dtype == np.float64
-    assert calendar_fert.dtype == np.float64
-    assert calendar_ndep.dtype == np.float64
-    assert calendar_prunt.dtype == np.float64
-    assert calendar_thint.dtype == np.float64
-    assert y.dtype == np.float64
-
-    def assert_eq(a, b):
-        assert a == b, f"Assertion failed: {a} != {b}"
-
-    assert_eq(params.shape, (100,))
-    assert_eq(matrix_weather.shape, (NMAXDAYS, 7))
-    assert_eq(calendar_fert.shape, (100, 3))
-    assert_eq(calendar_ndep.shape, (100, 3))
-    assert_eq(calendar_prunt.shape, (100, 3))
-    assert_eq(calendar_thint.shape, (100, 3))
-    assert_eq(y.shape, (ndays, nout))
-
-    # Get pointers to the data of each array.
-    params_ptr = params.ctypes.data_as(ctypes.c_void_p)
-    matrix_weather_ptr = matrix_weather.ctypes.data_as(ctypes.c_void_p)
-    calendar_fert_ptr = calendar_fert.ctypes.data_as(ctypes.c_void_p)
-    calendar_ndep_ptr = calendar_ndep.ctypes.data_as(ctypes.c_void_p)
-    calendar_prunt_ptr = calendar_prunt.ctypes.data_as(ctypes.c_void_p)
-    calendar_thint_ptr = calendar_thint.ctypes.data_as(ctypes.c_void_p)
-    y_ptr = y.ctypes.data_as(ctypes.c_void_p)
-    
-    # Call the Fortran routine. This call updates y in place.
-    lib.BASFOR_C(params_ptr, matrix_weather_ptr, calendar_fert_ptr,
-                 calendar_ndep_ptr, calendar_prunt_ptr, calendar_thint_ptr,
-                 ndays, nout, y_ptr)
-
-    # y now contains the output from BASFOR_C.
-    return y
-
-def call_dBASFOR_C(params, matrix_weather, calendar_fert, calendar_ndep,
-                  calendar_prunt, calendar_thint, ndays, dy):
-
-    nout = NOUT
-    assert ndays < NMAXDAYS
-
-    params = np.pad(params, (0, max(0, 100 - len(params))), mode='constant', constant_values=0)
-    
-    # Ensure the arrays are Fortran-ordered (column-major) since Fortran expects that.
-    params = np.asfortranarray(params, dtype=np.float64)
-    matrix_weather = np.asfortranarray(matrix_weather, dtype=np.float64)
-    calendar_fert = np.asfortranarray(calendar_fert, dtype=np.float64)
-    calendar_ndep = np.asfortranarray(calendar_ndep, dtype=np.float64)
-    calendar_prunt = np.asfortranarray(calendar_prunt, dtype=np.float64)
-    calendar_thint = np.asfortranarray(calendar_thint, dtype=np.float64)
-    dy = np.asfortranarray(dy, dtype=np.float64)
-    
-    # Load the shared library (adjust the library name/path as needed)
-    lib = ctypes.CDLL("../BASFOR_conif.so")
-    
-    # Set the argument types for the BASFOR_C routine.
-    # The Fortran subroutine accepts pointers (as c_void_p) and two integers.
-    lib.BASFOR_C.argtypes = [
-        ctypes.c_void_p,  # params_ptr
-        ctypes.c_void_p,  # params_ptr
-        ctypes.c_void_p,  # matrix_weather_ptr
-        ctypes.c_void_p,  # matrix_weather_ptr
-        ctypes.c_void_p,  # calendar_fert_ptr
-        ctypes.c_void_p,  # calendar_fert_ptr
-        ctypes.c_void_p,  # calendar_ndep_ptr
-        ctypes.c_void_p,  # calendar_ndep_ptr
-        ctypes.c_void_p,  # calendar_prunt_ptr
-        ctypes.c_void_p,  # calendar_prunt_ptr
-        ctypes.c_void_p,  # calendar_thint_ptr
-        ctypes.c_void_p,  # calendar_thint_ptr
-        ctypes.c_int,     # ndays
-        ctypes.c_int,     # nout
-        ctypes.c_void_p,   # y_ptr
-        ctypes.c_void_p   # y_ptr
-    ]
-    
-    assert params.dtype == np.float64
-    assert matrix_weather.dtype == np.float64
-    assert calendar_fert.dtype == np.float64
-    assert calendar_ndep.dtype == np.float64
-    assert calendar_prunt.dtype == np.float64
-    assert calendar_thint.dtype == np.float64
-    assert dy.dtype == np.float64
-
-    def assert_eq(a, b):
-        assert a == b, f"Assertion failed: {a} != {b}"
-
-    assert_eq(params.shape, (100,))
-    assert_eq(matrix_weather.shape, (NMAXDAYS, 7))
-    assert_eq(calendar_fert.shape, (100, 3))
-    assert_eq(calendar_ndep.shape, (100, 3))
-    assert_eq(calendar_prunt.shape, (100, 3))
-    assert_eq(calendar_thint.shape, (100, 3))
-    assert_eq(dy.shape, (ndays, nout))
-
-    dparams = np.zeros_like(params)
-    dmatrix_weather = np.zeros_like(matrix_weather)
-    dcalendar_fert = np.zeros_like(calendar_fert)
-    dcalendar_ndep = np.zeros_like(calendar_ndep)
-    dcalendar_prunt = np.zeros_like(calendar_prunt)
-    dcalendar_thint = np.zeros_like(calendar_thint)
-    y = np.zeros_like(dy)
-
-    # Get pointers to the data of each array.
-    params_ptr = params.ctypes.data_as(ctypes.c_void_p)
-    matrix_weather_ptr = matrix_weather.ctypes.data_as(ctypes.c_void_p)
-    calendar_fert_ptr = calendar_fert.ctypes.data_as(ctypes.c_void_p)
-    calendar_ndep_ptr = calendar_ndep.ctypes.data_as(ctypes.c_void_p)
-    calendar_prunt_ptr = calendar_prunt.ctypes.data_as(ctypes.c_void_p)
-    calendar_thint_ptr = calendar_thint.ctypes.data_as(ctypes.c_void_p)
-    y_ptr = y.ctypes.data_as(ctypes.c_void_p)
-
-    dparams_ptr = dparams.ctypes.data_as(ctypes.c_void_p)
-    dmatrix_weather_ptr = dmatrix_weather.ctypes.data_as(ctypes.c_void_p)
-    dcalendar_fert_ptr = dcalendar_fert.ctypes.data_as(ctypes.c_void_p)
-    dcalendar_ndep_ptr = dcalendar_ndep.ctypes.data_as(ctypes.c_void_p)
-    dcalendar_prunt_ptr = dcalendar_prunt.ctypes.data_as(ctypes.c_void_p)
-    dcalendar_thint_ptr = dcalendar_thint.ctypes.data_as(ctypes.c_void_p)
-    dy_ptr = dy.ctypes.data_as(ctypes.c_void_p)
-    
-    lib.dBASFOR_C(
-        params_ptr,
-        dparams_ptr,
-        matrix_weather_ptr, 
-        dmatrix_weather_ptr, 
-        calendar_fert_ptr,
-        dcalendar_fert_ptr,
-        calendar_ndep_ptr, 
-        dcalendar_ndep_ptr, 
-        calendar_prunt_ptr, 
-        dcalendar_prunt_ptr, 
-        calendar_thint_ptr,
-        dcalendar_thint_ptr,
-        ndays, nout, 
-        y_ptr,
-        dy_ptr
+    # Call the Fortran function
+    lib.BASFOR_C(
+        cast(args.params),
+        cast(args.matrix_weather),
+        cast(args.calendar_fert),
+        cast(args.calendar_ndep), 
+        cast(args.calendar_prunt), 
+        cast(args.calendar_thint),
+        ndays, 
+        NOUT, 
+        cast(args.y)
     )
 
-    grads = (dparams, dmatrix_weather, dcalendar_fert, dcalendar_ndep, dcalendar_prunt, dcalendar_thint)
+    return args.y
 
-    return grads
+def call_dBASFOR_C(params, matrix_weather, calendar_fert, calendar_ndep,
+                   calendar_prunt, calendar_thint, ndays, y):
+    
+    args = SimpleNamespace(**locals())
+
+    assert_shapes(args)
+    args = as_fortran(args)
+    dargs = zeros_like(args)
+
+    y = dargs.y
+    dargs.y = args.y
+    args.y = y
+    
+    lib.dBASFOR_C(
+        cast(args.params), cast(dargs.params), 
+        cast(args.matrix_weather), cast(dargs.matrix_weather),
+        cast(args.calendar_fert), cast(dargs.calendar_fert), 
+        cast(args.calendar_ndep), cast(dargs.calendar_ndep),
+        cast(args.calendar_prunt), cast(dargs.calendar_prunt), 
+        cast(args.calendar_thint), cast(dargs.calendar_thint),
+        args.ndays, 
+        NOUT, 
+        cast(args.y), cast(dargs.y)
+    )
+    
+    return (dargs.params, dargs.matrix_weather, dargs.calendar_fert, dargs.calendar_ndep, dargs.calendar_prunt, dargs.calendar_thint)
 
 def submit(fn, *args, **kwargs):
     from loky import get_reusable_executor
