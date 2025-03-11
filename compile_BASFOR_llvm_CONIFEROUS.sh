@@ -11,7 +11,7 @@ opt-$LLVM_VERSION -passes="instcombine,dce" merged.bc -o merged_opt.bc
 
 opt-$LLVM_VERSION merged_opt.bc --load-pass-plugin=/opt/Enzyme/enzyme/build/Enzyme/LLVMEnzyme-$LLVM_VERSION.so -passes=enzyme -o output.ll -S
 
-flang-new-$LLVM_VERSION -shared -std=f2018 -O3 -g -o BASFOR_conif.so output.ll -L /usr/lib/llvm-$LLVM_VERSION/lib
+flang-new-$LLVM_VERSION -shared -std=f2018 -O3 -g -o ADBASFOR/lib/BASFOR_conif.so output.ll -L /usr/lib/llvm-$LLVM_VERSION/lib
 
 rm *.ll
 rm *.bc

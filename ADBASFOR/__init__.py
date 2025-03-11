@@ -1,5 +1,5 @@
-from general import NOUT
-from call import call_BASFOR_C, call_dBASFOR_C, submit
+from .general import NOUT
+from .call import call_BASFOR_C, call_dBASFOR_C, submit
 
 import torch
 import torch.nn as nn

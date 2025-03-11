@@ -1,7 +1,8 @@
 import numpy as np
+import os
 from types import SimpleNamespace
 
-from general import NMAXDAYS, NOUT
+from .general import NMAXDAYS, NOUT
 
 C_SRC = """
 void BASFOR_C(double *params, double *matrix_weather,
@@ -20,9 +21,12 @@ void dBASFOR_C(double *params, double *dparams,
 
 #from basfor_cffi import lib, ffi
 
+_here = os.path.dirname(__file__)
+_so_path = os.path.join(_here, "lib", "BASFOR_conif.so")
+
 from cffi import FFI
 ffi = FFI()
-lib = ffi.dlopen("../BASFOR_conif.so")
+lib = ffi.dlopen(_so_path)
 ffi.cdef(C_SRC)
 
 def assert_eq(a, b):

@@ -1,4 +1,4 @@
-from general import *
+from ADBASFOR.general import *
 
 ## 1. SITE-SPECIFIC SETTINGS ##
 year_start     = 1900

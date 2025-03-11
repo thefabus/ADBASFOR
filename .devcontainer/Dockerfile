@@ -47,6 +47,9 @@ RUN conda install -y \
     loky \
     && conda clean -afy
 
+# Python package build tools
+RUN pip install --no-input build wheel
+
 # LLVM
 ARG LLVM_VERSION=16
 ENV LLVM_VERSION=${LLVM_VERSION}

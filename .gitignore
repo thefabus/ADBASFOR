@@ -217,3 +217,7 @@ pip-log.txt
 
 # Fortran
 *.mod
+
+# Outputs
+BASFOR_conif.so
+output_R.csv
