@@ -46,6 +46,7 @@ Subroutine N_dep(year,doy,DAYS_NDEP,NDEPV)
   real   ,dimension(100)   :: tNdep
   t     = year           + (doy           -0.5)/366
   tNdep = DAYS_NDEP(:,1) + (DAYS_NDEP(:,2)-0.5)/366
+  idep = 1
   do j = 2,100
    if ( (tNdep(j-1)<t) .and. (tNdep(j)>=t) ) idep = j-1
   end do
